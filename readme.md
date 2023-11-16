@@ -92,11 +92,11 @@ The RESTful API server provides endpoints for user management, including creatin
 
 ### Endpoints
 
-- POST /users: Create a new user
-- GET /users: Retrieve all users
-- GET /users/:​id: Retrieve a single user by ID
-- PUT /users/:​id: Update a user by ID
-- DELETE /users/:​id: Delete a user by ID
+- POST `/users`: Create a new user
+- GET `/users`: Retrieve all users
+- GET `/users/:id`: Retrieve a single user by ID
+- PUT `/users/:id`: Update a user by ID
+- DELETE `/users/:id`: Delete a user by ID
 
 ### Features
 
