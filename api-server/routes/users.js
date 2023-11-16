@@ -3,6 +3,7 @@ const bcrypt = require('bcrypt');
 const { body, validationResult } = require('express-validator');
 const router = express.Router();
 const db = require('../db');
+const logger = require('../logger');
 
 // Hashing difficulty level
 const saltRounds = 10;
@@ -53,8 +54,10 @@ router.post('/', createUserValidationRules, async (req, res) => {
     try {
         const hashedPassword = await bcrypt.hash(password, saltRounds);
         const { rows } = await db.query('INSERT INTO users (username, email, password) VALUES ($1, $2, $3) RETURNING *', [username, email, hashedPassword]);
+        logger.info('New user created:', rows[0].username);
         res.status(201).json(rows[0]);
     } catch (error) {
+        logger.error('Error creating user:\n', error);
         res.status(500).json({ error: error.message });
     }
 });
@@ -63,8 +66,10 @@ router.post('/', createUserValidationRules, async (req, res) => {
 router.get('/', async (req, res) => {
     try {
         const { rows } = await db.query('SELECT id, username, email FROM users');
+        logger.info('All users retrieved');
         res.json(rows);
     } catch (error) {
+        logger.error('Error retrieving users:\n', error);
         res.status(500).json({ error: error.message });
     }
 });
@@ -77,8 +82,10 @@ router.get('/:id', async (req, res) => {
         if (rows.length === 0) {
             return res.status(404).send('User not found');
         }
+        logger.info('User retrieved:', rows[0].username);
         res.json(rows[0]);
     } catch (error) {
+        logger.error('Error retrieving user:\n', error);
         res.status(500).json({ error: error.message });
     }
 });
@@ -122,8 +129,10 @@ router.put('/:id', updateUserValidationRules, async (req, res) => {
         if (rows.length === 0) {
             return res.status(404).send('User not found');
         }
+        logger.info('User updated:', rows[0].username);
         res.json(rows[0]);
     } catch (error) {
+        logger.error('Error updating user:\n', error);
         res.status(500).json({ error: error.message });
     }
 });
@@ -133,8 +142,10 @@ router.delete('/:id', async (req, res) => {
     try {
         const { id } = req.params;
         await db.query('DELETE FROM users WHERE id = $1', [id]);
+        logger.info('User deleted:', id);
         res.status(204).send();
     } catch (error) {
+        logger.error('Error deleting user:\n', error);
         res.status(500).json({ error: error.message });
     }
 });
